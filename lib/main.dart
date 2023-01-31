@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_coding_todo/config/config.dart';
+import 'package:provider/provider.dart';
 
+import 'provider/todo_provider.dart';
 import 'screen/home_screen.dart';
 
 void main() {
@@ -13,14 +15,19 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (BuildContext context) => TodoProvider())
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
 
-      theme: ThemeData(
-        fontFamily: 'noto',
-        primaryColor: appMainColor,
+        theme: ThemeData(
+          fontFamily: 'noto',
+          primaryColor: appMainColor,
+        ),
+        home: HomeScreen(),
       ),
-      home: HomeScreen(),
     );
   }
 }

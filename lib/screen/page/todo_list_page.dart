@@ -1,7 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_coding_todo/provider/todo_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../config/config.dart';
+import '../../vo/todo.dart';
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({Key? key}) : super(key: key);
@@ -11,6 +14,13 @@ class TodoListPage extends StatefulWidget {
 }
 
 class _TodoListPageState extends State<TodoListPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<TodoProvider>(context,listen: false).getAll();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -47,78 +57,32 @@ class _TodoListPageState extends State<TodoListPage> {
               child: Container(
                 width: double.infinity,
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      TodoBox(
-                        title: '플러터 디자인',
-                        content: 'Container 공부하기',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인1',
-                        content: 'Container 공부하기1',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인2',
-                        content: 'Container 공부하기2',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인3',
-                        content: 'Container 공부하기3',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인',
-                        content: 'Container 공부하기',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인1',
-                        content: 'Container 공부하기1',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인2',
-                        content: 'Container 공부하기2',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인3',
-                        content: 'Container 공부하기3',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인',
-                        content: 'Container 공부하기',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인1',
-                        content: 'Container 공부하기1',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인2',
-                        content: 'Container 공부하기2',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인3',
-                        content: 'Container 공부하기3',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인',
-                        content: 'Container 공부하기',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인1',
-                        content: 'Container 공부하기1',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인2',
-                        content: 'Container 공부하기2',
-                      ),
-                      TodoBox(
-                        title: '플러터 디자인3',
-                        content: 'Container 공부하기3',
-                      ),
+                  child: Consumer<TodoProvider>(builder: (context, todoProvider, child){
+                    return Column(
+                      children: todoProvider.currentTodoList.map((todo) =>
+                          TodoBox(
+                            title: todo.type,
+                            content: todo.title,
+                            isComplete:todo.completeNy=='y' ? true : false,
+                            onTap: () async{
+                              var result = await Provider.of<TodoProvider>(context,listen: false).updateComplete(
+                                  todo:Todo(
+                                      todoIdx: todo.todoIdx,
+                                      completeNy: 'y'
+                                  )
+                              );
 
+                              if(result=='ok'){
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text("${todo.title} 완료됨."),
+                                ));
+                              }
 
-
-
-                    ],
-                  ),
+                            },
+                          )
+                      ).toList(),
+                    );
+                  },)
                 ),
               )
           )
@@ -137,11 +101,15 @@ class TodoBox extends StatelessWidget {
 
   String title;
   String content;
+  bool isComplete;
+  Function onTap;
 
 
   TodoBox({
     required this.title,
-    required this.content
+    required this.content,
+    required this.isComplete,
+    required this.onTap
   });
 
 
@@ -163,8 +131,12 @@ class TodoBox extends StatelessWidget {
             ],
           ),
 
+          isComplete ?
+          Text('완료됨') :
           OutlinedButton(
-              onPressed: (){},
+              onPressed: (){
+                onTap();
+              },
               child: Text('완료')
           )
         ],

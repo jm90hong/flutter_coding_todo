@@ -29,7 +29,13 @@ class _HomeScreenState extends State<HomeScreen> {
           index: curIndex,
           children: [
             TodoListPage(),
-            AddTodoPage(),
+            AddTodoPage(
+              onAdd: (){
+                setState(() {
+                  curIndex=0;
+                });
+              },
+            ),
             InfoPage()
           ],
         )
